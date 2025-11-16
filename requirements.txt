@@ -7,3 +7,4 @@ python-dotenv
 Werkzeug
 openai
 cryptography
+APScheduler  
