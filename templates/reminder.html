@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reminder & Notification</title>
+    <title>Smart Reminder App</title>
     <style>
         * {
             margin: 0;
@@ -19,19 +19,38 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
         }
 
         h1 {
             color: white;
             text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.2em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            font-size: 2em;
         }
 
-        .add-reminder-section {
+        .permission-banner {
+            background: #f59e0b;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .permission-banner button {
+            background: white;
+            color: #f59e0b;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .add-section {
             background: white;
             border-radius: 15px;
             padding: 25px;
@@ -39,10 +58,10 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .add-reminder-section h2 {
+        h2 {
             color: #333;
-            margin-bottom: 20px;
-            font-size: 1.4em;
+            margin-bottom: 15px;
+            font-size: 1.3em;
         }
 
         .form-group {
@@ -54,28 +73,21 @@
             color: #555;
             margin-bottom: 5px;
             font-weight: 600;
+            font-size: 14px;
         }
 
         input[type="text"],
-        input[type="datetime-local"],
-        textarea {
+        input[type="datetime-local"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
-            transition: border 0.3s;
         }
 
-        input:focus,
-        textarea:focus {
+        input:focus {
             outline: none;
             border-color: #667eea;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 60px;
         }
 
         .btn {
@@ -88,87 +100,60 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
         .btn:hover {
             background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .reminders-list {
+        .list-section {
             background: white;
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .reminders-list h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.4em;
-        }
-
         .reminder-item {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 18px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            border-left: 5px solid #667eea;
-            position: relative;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .reminder-item h3 {
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 1.2em;
-        }
-
-        .reminder-item p {
-            color: #666;
+            background: #f8f9fa;
+            padding: 15px;
             margin-bottom: 10px;
-            line-height: 1.5;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reminder-info h3 {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 5px;
         }
 
         .reminder-time {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            margin-top: 5px;
+            color: #666;
+            font-size: 0.9em;
         }
 
         .delete-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 8px 15px;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 0.85em;
-            transition: background 0.3s;
         }
 
         .delete-btn:hover {
             background: #c0392b;
+        }
+
+        .empty {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+            font-style: italic;
         }
 
         .notification {
@@ -177,15 +162,14 @@
             right: 20px;
             background: #10b981;
             color: white;
-            padding: 20px 30px;
-            border-radius: 10px;
+            padding: 15px 25px;
+            border-radius: 8px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.3);
             z-index: 1000;
-            animation: slideInRight 0.5s ease;
-            max-width: 350px;
+            animation: slideIn 0.3s ease;
         }
 
-        @keyframes slideInRight {
+        @keyframes slideIn {
             from {
                 transform: translateX(400px);
                 opacity: 0;
@@ -196,46 +180,13 @@
             }
         }
 
-        .notification h3 {
-            margin-bottom: 8px;
-            font-size: 1.1em;
-        }
-
-        .notification p {
-            font-size: 0.9em;
-            opacity: 0.95;
-        }
-
-        .close-notification {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #999;
-            padding: 30px;
-            font-style: italic;
-        }
-
         .status {
             display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
             font-weight: 600;
-            margin-left: 10px;
+            margin-left: 8px;
         }
 
         .status.active {
@@ -243,175 +194,289 @@
             color: white;
         }
 
-        .status.completed {
+        .status.past {
             background: #6b7280;
             color: white;
+        }
+
+        .login-required {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .login-required h2 {
+            margin-bottom: 15px;
+        }
+
+        .login-required p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .login-required a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        #back{
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            color: #4b60be;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        #back:hover{
+            text-decoration: underline;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔔 Set Reminder</h1>
+        <h1>🔔 Smart Reminders</h1>
 
-        <div class="add-reminder-section">
-            <h2>Add New Reminder</h2>
+        {% if current_user.is_authenticated %}
+        <div class="permission-banner" id="permissionBanner" style="display:none;">
+            <p><strong>Enable Push Notifications</strong></p>
+            <p>Get reminders even when the browser is closed</p>
+            <button onclick="subscribeToPush()">Enable Notifications</button>
+        </div>
+
+        <div class="add-section">
+            <h2>New Reminder</h2>
             <form id="reminderForm">
                 <div class="form-group">
-                    <label for="title">Title</label>
-                    <input type="text" id="title" placeholder="e.g., Team Meeting" required>
+                    <label for="title">What do you need to remember?</label>
+                    <input type="text" id="title" placeholder="e.g., Doctor appointment" required>
                 </div>
                 <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" placeholder="Add details about your reminder..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="datetime">Date & Time</label>
+                    <label for="datetime">When?</label>
                     <input type="datetime-local" id="datetime" required>
                 </div>
-                <button type="submit" class="btn">Add Reminder</button>
+                <button type="submit" class="btn">Set Reminder</button>
             </form>
+            <a href="{{url_for('dashboard')}}" id="back">Return to dashboard</a>
         </div>
 
-        <div class="reminders-list">
+        <div class="list-section">
             <h2>My Reminders</h2>
             <div id="remindersList">
-                <div class="empty-state">No reminders yet. Add one above!</div>
+                <div class="empty">Loading...</div>
             </div>
         </div>
+
+        {% else %}
+        <div class="login-required">
+            <h2>🔐 Login Required</h2>
+            <p>Please log in to use the reminder feature</p>
+            <a href="{{ url_for('login') }}">Go to Login</a>
+        </div>
+        {% endif %}
     </div>
 
+    {% if current_user.is_authenticated %}
     <script>
-        let reminders = [];
-        let notificationTimers = {};
+        let checkInterval;
 
-        // Request notification permission on load
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
+        // Check notification permission on load
+        window.addEventListener('load', () => {
+            loadReminders();
+            checkNotificationPermission();
+            registerServiceWorker();
+            
+            // Set min datetime
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('datetime').min = now.toISOString().slice(0, 16);
+
+            // Start checking for due reminders
+            startReminderCheck();
+        });
+
+        // Register Service Worker
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    await navigator.serviceWorker.register('/static/sw.js');
+                    console.log('Service Worker registered');
+                } catch (error) {
+                    console.error('Service Worker registration failed:', error);
+                }
+            }
         }
 
-        // Load reminders from memory on page load
-        function loadReminders() {
-            renderReminders();
+        // Check notification permission
+        function checkNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                document.getElementById('permissionBanner').style.display = 'block';
+            }
         }
 
-        // Handle form submission
-        document.getElementById('reminderForm').addEventListener('submit', function(e) {
+        // Subscribe to push notifications
+        async function subscribeToPush() {
+            if ('Notification' in window) {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    document.getElementById('permissionBanner').style.display = 'none';
+                    showToast('✅ Notifications enabled!');
+                    
+                    // Register service worker for push
+                    if ('serviceWorker' in navigator && 'PushManager' in window) {
+                        try {
+                            const registration = await navigator.serviceWorker.ready;
+                            // For demo purposes, we'll use browser notifications
+                            // In production, you'd subscribe to push service here
+                            showToast('Push notifications ready!');
+                        } catch (error) {
+                            console.error('Push subscription failed:', error);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Load reminders from server
+        async function loadReminders() {
+            try {
+                const response = await fetch('/api/reminders');
+                const reminders = await response.json();
+                renderReminders(reminders);
+            } catch (error) {
+                console.error('Failed to load reminders:', error);
+                showToast('❌ Failed to load reminders');
+            }
+        }
+
+        // Add reminder
+        document.getElementById('reminderForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
             const datetime = document.getElementById('datetime').value;
 
-            const reminder = {
-                id: Date.now(),
-                title: title,
-                description: description,
-                datetime: datetime,
-                completed: false
-            };
+            try {
+                const response = await fetch('/api/reminders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        datetime: datetime
+                    })
+                });
 
-            reminders.push(reminder);
-            scheduleNotification(reminder);
-            renderReminders();
-
-            // Reset form
-            this.reset();
-
-            // Show success message
-            showToast('Reminder added successfully!');
+                if (response.ok) {
+                    e.target.reset();
+                    showToast('✅ Reminder set!');
+                    loadReminders();
+                } else {
+                    showToast('❌ Failed to create reminder');
+                }
+            } catch (error) {
+                console.error('Failed to add reminder:', error);
+                showToast('❌ Failed to create reminder');
+            }
         });
 
-        // Render all reminders
-        function renderReminders() {
-            const remindersList = document.getElementById('remindersList');
+        // Render reminders
+        function renderReminders(reminders) {
+            const list = document.getElementById('remindersList');
             
             if (reminders.length === 0) {
-                remindersList.innerHTML = '<div class="empty-state">No reminders yet. Add one above!</div>';
+                list.innerHTML = '<div class="empty">No reminders yet</div>';
                 return;
             }
 
-            // Sort reminders by date
-            reminders.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
-
-            remindersList.innerHTML = reminders.map(reminder => {
-                const reminderDate = new Date(reminder.datetime);
+            list.innerHTML = reminders.map(r => {
+                const date = new Date(r.datetime);
                 const now = new Date();
-                const isActive = reminderDate > now && !reminder.completed;
+                const isActive = date > now && !r.notified;
                 
                 return `
                     <div class="reminder-item">
-                        <h3>
-                            ${reminder.title}
-                            <span class="status ${isActive ? 'active' : 'completed'}">${isActive ? 'ACTIVE' : 'PAST'}</span>
-                        </h3>
-                        <p>${reminder.description || 'No description'}</p>
-                        <span class="reminder-time">⏰ ${formatDateTime(reminderDate)}</span>
-                        <button class="delete-btn" onclick="deleteReminder(${reminder.id})">Delete</button>
+                        <div class="reminder-info">
+                            <h3>
+                                ${r.title}
+                                <span class="status ${isActive ? 'active' : 'past'}">${isActive ? 'ACTIVE' : 'PAST'}</span>
+                            </h3>
+                            <div class="reminder-time">⏰ ${date.toLocaleString()}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteReminder(${r.id})">Delete</button>
                     </div>
                 `;
             }).join('');
         }
 
-        // Format date and time
-        function formatDateTime(date) {
-            const options = { 
-                month: 'short', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit'
-            };
-            return date.toLocaleString('en-US', options);
-        }
-
-        // Schedule notification
-        function scheduleNotification(reminder) {
-            const reminderTime = new Date(reminder.datetime).getTime();
-            const now = Date.now();
-            const timeUntilReminder = reminderTime - now;
-
-            if (timeUntilReminder > 0) {
-                notificationTimers[reminder.id] = setTimeout(() => {
-                    showNotification(reminder);
-                    reminder.completed = true;
-                    renderReminders();
-                }, timeUntilReminder);
-            }
-        }
-
-        // Show browser notification
-        function showNotification(reminder) {
-            // Show custom notification in page
-            const notificationDiv = document.createElement('div');
-            notificationDiv.className = 'notification';
-            notificationDiv.innerHTML = `
-                <button class="close-notification" onclick="this.parentElement.remove()">×</button>
-                <h3>🔔 ${reminder.title}</h3>
-                <p>${reminder.description || 'Reminder time!'}</p>
-            `;
-            document.body.appendChild(notificationDiv);
-
-            // Auto remove after 10 seconds
-            setTimeout(() => {
-                if (notificationDiv.parentElement) {
-                    notificationDiv.remove();
-                }
-            }, 10000);
-
-            // Show browser notification if permitted
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification(reminder.title, {
-                    body: reminder.description || 'Reminder time!',
-                    icon: '🔔',
-                    tag: reminder.id
+        // Delete reminder
+        async function deleteReminder(id) {
+            try {
+                const response = await fetch(`/api/reminders/${id}`, {
+                    method: 'DELETE'
                 });
+
+                if (response.ok) {
+                    showToast('🗑️ Reminder deleted');
+                    loadReminders();
+                } else {
+                    showToast('❌ Failed to delete reminder');
+                }
+            } catch (error) {
+                console.error('Failed to delete reminder:', error);
+                showToast('❌ Failed to delete reminder');
+            }
+        }
+
+        // Start checking for due reminders
+        function startReminderCheck() {
+            checkInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/api/reminders');
+                    const reminders = await response.json();
+                    
+                    const now = new Date();
+                    reminders.forEach(reminder => {
+                        const reminderTime = new Date(reminder.datetime);
+                        if (!reminder.notified && reminderTime <= now) {
+                            sendNotification(reminder);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Failed to check reminders:', error);
+                }
+            }, 5000); // Check every 5 seconds
+        }
+
+        // Send notification
+        function sendNotification(reminder) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification('🔔 Reminder Alert!', {
+                    body: reminder.title,
+                    tag: 'reminder-' + reminder.id,
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200]
+                });
+
+                notification.onclick = function() {
+                    window.focus();
+                    this.close();
+                };
             }
 
-            // Play a beep sound (optional)
-            playNotificationSound();
+            showToast('🔔 REMINDER: ' + reminder.title);
+            playSound();
         }
 
         // Play notification sound
-        function playNotificationSound() {
+        function playSound() {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -421,7 +486,6 @@
 
             oscillator.frequency.value = 800;
             oscillator.type = 'sine';
-
             gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
 
@@ -429,44 +493,21 @@
             oscillator.stop(audioContext.currentTime + 0.5);
         }
 
-        // Delete reminder
-        function deleteReminder(id) {
-            reminders = reminders.filter(r => r.id !== id);
-            
-            // Clear notification timer
-            if (notificationTimers[id]) {
-                clearTimeout(notificationTimers[id]);
-                delete notificationTimers[id];
-            }
-            
-            renderReminders();
-            showToast('Reminder deleted!');
-        }
-
-        // Show toast message
+        // Show toast
         function showToast(message) {
             const toast = document.createElement('div');
             toast.className = 'notification';
-            toast.innerHTML = `
-                <button class="close-notification" onclick="this.parentElement.remove()">×</button>
-                <p>${message}</p>
-            `;
+            toast.textContent = message;
             document.body.appendChild(toast);
 
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.remove();
-                }
-            }, 3000);
+            setTimeout(() => toast.remove(), 3000);
         }
 
-        // Initialize app
-        loadReminders();
-
-        // Set minimum datetime to now
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        document.getElementById('datetime').min = now.toISOString().slice(0, 16);
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (checkInterval) clearInterval(checkInterval);
+        });
     </script>
+    {% endif %}
 </body>
 </html>

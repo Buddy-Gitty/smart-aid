@@ -1,8 +1,11 @@
 from openai import OpenAI
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timezone
+import json
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import os
@@ -44,6 +47,21 @@ class Document(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref='documents')
 
+class Reminder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    datetime = db.Column(db.DateTime, nullable=False)
+    notified = db.Column(db.Boolean, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='reminders')
+    created_at = db.Column(db.DateTime, default=lambda:datetime.now(timezone.utc))
+
+class PushSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    subscription_json = db.Column(db.Text, nullable=False)
+    user = db.relationship('User', backref='push_subscriptions')
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -61,6 +79,10 @@ MODEL_NAME = "gpt-4o-mini"
 def home():
     return render_template("index.html")
 
+@app.route("/location")
+def location():
+    return render_template("location.html")
+
 @app.route("/demo")
 def demo():
     return render_template("demo.html")
@@ -69,9 +91,6 @@ def demo():
 def reminder():
     return render_template("reminder.html")
 
-@app.route("/location")
-def location():
-    return render_template("location.html")
 
 @app.route('/registration', methods=['GET', 'POST'])
 def registration():
@@ -182,6 +201,82 @@ def logout():
     flash('Logged out successfully!', 'info')
     return redirect(url_for('home'))
 
+@app.route('/api/reminders', methods=['GET'])
+@login_required
+def get_reminders():
+    reminders = Reminder.query.filter_by(user_id=current_user.id).order_by(Reminder.datetime).all()
+    return jsonify([{
+        'id': r.id,
+        'title': r.title,
+        'datetime': r.datetime.isoformat(),
+        'notified': r.notified
+    } for r in reminders])
+
+@app.route('/api/reminders', methods=['POST'])
+@login_required
+def add_reminder():
+    data = request.json
+    reminder = Reminder(
+        title=data['title'],
+        datetime=datetime.fromisoformat(data['datetime']),
+        user_id=current_user.id
+    )
+    db.session.add(reminder)
+    db.session.commit()
+    return jsonify({'id': reminder.id, 'message': 'Reminder created'}), 201
+
+@app.route('/api/reminders/<int:reminder_id>', methods=['DELETE'])
+@login_required
+def delete_reminder(reminder_id):
+    reminder = Reminder.query.get_or_404(reminder_id)
+    if reminder.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    db.session.delete(reminder)
+    db.session.commit()
+    return jsonify({'message': 'Reminder deleted'}), 200
+
+@app.route('/api/push-subscription', methods=['POST'])
+@login_required
+def save_push_subscription():
+    subscription_json = request.json
+    
+    # Delete old subscriptions for this user
+    PushSubscription.query.filter_by(user_id=current_user.id).delete()
+    
+    # Save new subscription
+    subscription = PushSubscription(
+        user_id=current_user.id,
+        subscription_json=json.dumps(subscription_json)
+    )
+    db.session.add(subscription)
+    db.session.commit()
+    return jsonify({'message': 'Subscription saved'}), 201
+
+def check_reminders():
+    with app.app_context():
+        now = datetime.now()  # Changed from utcnow() to now()
+        due_reminders = Reminder.query.filter(
+            Reminder.datetime <= now,
+            Reminder.notified == False
+        ).all()
+        
+        for reminder in due_reminders:
+            # Mark as notified
+            reminder.notified = True
+            db.session.commit()
+            
+            print(f"🔔 Reminder due: {reminder.title} for user {reminder.user_id}")
+
+# Initialize scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=check_reminders, trigger="interval", seconds=30)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+import atexit
+atexit.register(lambda: scheduler.shutdown())
+
 @app.route("/chat", methods=['POST'])
 def chat():
     user_message = request.json.get("message", "")
@@ -234,10 +329,12 @@ def chat():
     return jsonify({"reply": reply_text})
 
 if __name__ == "__main__":
-    from os import environ
-    app.run(host='0.0.0.0', port=int(environ.get('PORT', 5000)))
-    # Create database tables if they don't exist
+    # Create database tables BEFORE running the app
     with app.app_context():
         db.create_all()
-
-    app.run(debug=True)
+        print("✅ Database tables created successfully!")
+    
+    # Run the app
+    from os import environ
+    port = int(environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)

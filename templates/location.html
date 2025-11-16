@@ -104,11 +104,17 @@
             transform: translateY(-2px);
         }
 
-        .btn-dentist {
+        .btn-back {
+            display: flex;
+            align-items: center;
             background: #f39c12;
         }
+        .btn-back a {
+            color: white;
+            text-decoration: none;
+        }
 
-        .btn-dentist:hover:not(:disabled) {
+        .btn-back:hover:not(:disabled) {
             background: #e67e22;
             transform: translateY(-2px);
         }
@@ -226,8 +232,9 @@
 <body>
     <div class="container">
         <div class="header">
+            <button class="btn-back"><a href="{{url_for('home')}}"> Back </a></button>
             <h1>🏥 Hospital & Clinic Finder</h1>
-            <p class="subtitle">Find nearby healthcare facilities instantly - Free & No API Key Required</p>
+            <p class="subtitle">Find nearby healthcare facilities instantly </p>
         </div>
 
         <div class="controls">
