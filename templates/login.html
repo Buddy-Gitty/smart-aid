@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>smartaid - Login</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body class="login-page">
+        
+        <div class="login-container">
+            <div class="header">
+                <div class="health-icon">🩺</div>
+                <h1>Login to join us</h1>
+                <p>Access your health dashboard</p>
+            </div>
+            
+            <div class="security-badge">
+                <span>🔒</span>
+                <span>Your health data is secure and confidential</span>
+            </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+        <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password" >Password</label>
+                <input type="password" name="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="form-options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                <a href="#" class="forgot-link">Forgot Password?</a>
+            </div>
+
+            <button class="login-btn" ><a style="color: white;text-decoration: none;transition: opacity 0.3s;" href="{{ url_for('home') }}">Back to home</a></button>
+            <button type="submit" class="login-btn" >Sign In</button>
+        </form>
+
+        <div class="signup-text">
+            New patient? <a href="{{ url_for('registration')}}">Create Account</a>
+        </div>
+    </div>
+</body>
+</html>

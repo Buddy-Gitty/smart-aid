@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAid - Chatbot Demo</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+    <nav class="container">
+        <div class="logo">SmartAid</div>
+        
+        <!-- Hamburger Toggle Button -->
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="nav-links" id="navLinks">
+            <li><a href="{{ url_for('home')}}">Home</a></li>
+            <li><a href="#demo">Chat Bot</a></li>
+            <li><a href="#contact">Contact</a></li>
+            
+            <!-- Auth Section - stays in same place -->
+            <li class="auth-item">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="auth-link">
+                        Dashboard
+                        {% if current_user.profile_pic %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" class="profile-photo" alt="Profile">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='profile_pics/default.png') }}" class="profile-photo" alt="Profile">
+                        {% endif %}
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="auth-link">Login</a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+</header>
+
+
+<section class="demo">
+    <div class="container">
+        <h2>SmartAid Chatbot</h2>
+
+        <div class="demo-container" id="chat-box">
+            <!-- Chat messages appear here -->
+        </div>
+
+        <form id="chat-form">
+            <input type="text" id="user-input" placeholder="Describe your symptoms..." autocomplete="off">
+            <button type="submit" id="send-btn">Send</button>
+        </form>
+    </div>
+</section>
+
+<footer id="contact">
+    <div class="container">
+        <h4>Contact</h4>
+        <p>support@smartaid.com<br>1-800-SMART-AID</p>
+        <p>&copy; 2025 SmartAid. All rights reserved.</p>
+    </div>
+</footer>
+
+
+    <script>
+        // Toggle mobile menu
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        navToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
+                navToggle.classList.remove('active');
+            }
+        });
+        
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                navToggle.classList.remove('active');
+            });
+        });
+const chatForm = document.getElementById('chat-form');
+const userInput = document.getElementById('user-input');
+const chatBox = document.getElementById('chat-box');
+
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = userInput.value.trim();
+    if (!message) return;
+
+    // Show user message
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-message user';
+    userDiv.textContent = message;
+    chatBox.appendChild(userDiv);
+
+    userInput.value = '';
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Send to backend
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+
+        // Show bot reply
+        const botDiv = document.createElement('div');
+        botDiv.className = 'chat-message bot';
+        botDiv.textContent = data.reply;
+        chatBox.appendChild(botDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (error) {
+        const botDiv = document.createElement('div');
+        botDiv.className = 'chat-message bot';
+        botDiv.textContent = "❌ Something went wrong. Please try again.";
+        chatBox.appendChild(botDiv);
+    }
+});
+</script>
+
+</body>
+</html>

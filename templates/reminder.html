@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reminder & Notification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .add-reminder-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .add-reminder-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .reminders-list {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .reminders-list h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        .reminder-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 18px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .reminder-item h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .reminder-item p {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .reminder-time {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideInRight 0.5s ease;
+            max-width: 350px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification h3 {
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .notification p {
+            font-size: 0.9em;
+            opacity: 0.95;
+        }
+
+        .close-notification {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status.active {
+            background: #10b981;
+            color: white;
+        }
+
+        .status.completed {
+            background: #6b7280;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔔 Set Reminder</h1>
+
+        <div class="add-reminder-section">
+            <h2>Add New Reminder</h2>
+            <form id="reminderForm">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" placeholder="e.g., Team Meeting" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Add details about your reminder..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="datetime">Date & Time</label>
+                    <input type="datetime-local" id="datetime" required>
+                </div>
+                <button type="submit" class="btn">Add Reminder</button>
+            </form>
+        </div>
+
+        <div class="reminders-list">
+            <h2>My Reminders</h2>
+            <div id="remindersList">
+                <div class="empty-state">No reminders yet. Add one above!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let reminders = [];
+        let notificationTimers = {};
+
+        // Request notification permission on load
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        // Load reminders from memory on page load
+        function loadReminders() {
+            renderReminders();
+        }
+
+        // Handle form submission
+        document.getElementById('reminderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const datetime = document.getElementById('datetime').value;
+
+            const reminder = {
+                id: Date.now(),
+                title: title,
+                description: description,
+                datetime: datetime,
+                completed: false
+            };
+
+            reminders.push(reminder);
+            scheduleNotification(reminder);
+            renderReminders();
+
+            // Reset form
+            this.reset();
+
+            // Show success message
+            showToast('Reminder added successfully!');
+        });
+
+        // Render all reminders
+        function renderReminders() {
+            const remindersList = document.getElementById('remindersList');
+            
+            if (reminders.length === 0) {
+                remindersList.innerHTML = '<div class="empty-state">No reminders yet. Add one above!</div>';
+                return;
+            }
+
+            // Sort reminders by date
+            reminders.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+
+            remindersList.innerHTML = reminders.map(reminder => {
+                const reminderDate = new Date(reminder.datetime);
+                const now = new Date();
+                const isActive = reminderDate > now && !reminder.completed;
+                
+                return `
+                    <div class="reminder-item">
+                        <h3>
+                            ${reminder.title}
+                            <span class="status ${isActive ? 'active' : 'completed'}">${isActive ? 'ACTIVE' : 'PAST'}</span>
+                        </h3>
+                        <p>${reminder.description || 'No description'}</p>
+                        <span class="reminder-time">⏰ ${formatDateTime(reminderDate)}</span>
+                        <button class="delete-btn" onclick="deleteReminder(${reminder.id})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Format date and time
+        function formatDateTime(date) {
+            const options = { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit'
+            };
+            return date.toLocaleString('en-US', options);
+        }
+
+        // Schedule notification
+        function scheduleNotification(reminder) {
+            const reminderTime = new Date(reminder.datetime).getTime();
+            const now = Date.now();
+            const timeUntilReminder = reminderTime - now;
+
+            if (timeUntilReminder > 0) {
+                notificationTimers[reminder.id] = setTimeout(() => {
+                    showNotification(reminder);
+                    reminder.completed = true;
+                    renderReminders();
+                }, timeUntilReminder);
+            }
+        }
+
+        // Show browser notification
+        function showNotification(reminder) {
+            // Show custom notification in page
+            const notificationDiv = document.createElement('div');
+            notificationDiv.className = 'notification';
+            notificationDiv.innerHTML = `
+                <button class="close-notification" onclick="this.parentElement.remove()">×</button>
+                <h3>🔔 ${reminder.title}</h3>
+                <p>${reminder.description || 'Reminder time!'}</p>
+            `;
+            document.body.appendChild(notificationDiv);
+
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (notificationDiv.parentElement) {
+                    notificationDiv.remove();
+                }
+            }, 10000);
+
+            // Show browser notification if permitted
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(reminder.title, {
+                    body: reminder.description || 'Reminder time!',
+                    icon: '🔔',
+                    tag: reminder.id
+                });
+            }
+
+            // Play a beep sound (optional)
+            playNotificationSound();
+        }
+
+        // Play notification sound
+        function playNotificationSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Delete reminder
+        function deleteReminder(id) {
+            reminders = reminders.filter(r => r.id !== id);
+            
+            // Clear notification timer
+            if (notificationTimers[id]) {
+                clearTimeout(notificationTimers[id]);
+                delete notificationTimers[id];
+            }
+            
+            renderReminders();
+            showToast('Reminder deleted!');
+        }
+
+        // Show toast message
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'notification';
+            toast.innerHTML = `
+                <button class="close-notification" onclick="this.parentElement.remove()">×</button>
+                <p>${message}</p>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
+
+        // Initialize app
+        loadReminders();
+
+        // Set minimum datetime to now
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('datetime').min = now.toISOString().slice(0, 16);
+    </script>
+</body>
+</html>

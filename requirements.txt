@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Flask-Bcrypt
+Flask-Login
+PyMySQL
+python-dotenv
+Werkzeug
+openai
+cryptography

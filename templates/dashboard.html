@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartAid Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f7f9fc;
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+    }
+
+    /* Header styling */
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 15px 0;
+      position: relative;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 25px;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+
+    .nav-links a:hover {
+      opacity: 0.8;
+    }
+
+    .profile-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid white;
+      object-fit: cover;
+    }
+
+    /* Toggle Button */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .bar {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 4px 0;
+      transition: 0.3s;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-top: 30px;
+      margin-bottom: 30px;
+    }
+
+    .row {
+      display: flex;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .col-left {
+      flex: 0 0 calc(33.333% - 17px);
+    }
+
+    .col-right {
+      flex: 0 0 calc(66.667% - 8px);
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .profile-image {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      display: block;
+      margin: 0 auto 20px;
+      object-fit: cover;
+    }
+
+    h5 {
+      font-size: 1.25rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    h6 {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #333;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    .info-list {
+      list-style: none;
+    }
+
+    .info-list li {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e9ecef;
+      color: #555;
+      word-wrap: break-word;
+    }
+
+    .info-list li:last-child {
+      border-bottom: none;
+    }
+
+    .info-list b {
+      color: #333;
+      margin-right: 8px;
+    }
+
+    /* Button Container */
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .btn-warning:hover {
+      background: #e0a800;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+      padding: 8px 16px;
+      font-size: 0.875rem;
+      white-space: nowrap;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    /* File Upload Form */
+    .upload-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .file-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+    }
+
+    .file-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    /* Document List */
+    .doc-list {
+      list-style: none;
+      margin-top: 15px;
+    }
+
+    .doc-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: #f8f9fa;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .doc-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .doc-item a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      word-break: break-word;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .doc-item a:hover {
+      text-decoration: underline;
+    }
+
+    .doc-item form {
+      display: inline;
+    }
+
+    .empty-state {
+      color: #999;
+      font-style: italic;
+      padding: 15px;
+      text-align: center;
+    }
+
+    /* Tablet View */
+    @media (max-width: 992px) {
+      .col-left,
+      .col-right {
+        flex: 0 0 100%;
+      }
+    }
+
+    /* Mobile View */
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 1.4rem;
+      }
+
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background: #667eea;
+        width: 100%;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        padding: 20px 0;
+        text-align: center;
+        z-index: 100;
+        gap: 15px;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .container {
+        padding: 0 15px;
+      }
+
+      .main-content {
+        margin-top: 20px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .profile-image {
+        width: 120px;
+        height: 120px;
+      }
+
+      h5 {
+        font-size: 1.1rem;
+      }
+
+      h6 {
+        font-size: 1rem;
+      }
+
+      .info-list li {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+
+      .button-container {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        min-width: auto;
+      }
+
+      .upload-form {
+        flex-direction: column;
+      }
+
+      .file-input {
+        min-width: auto;
+        width: 100%;
+      }
+
+      .doc-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .doc-item a {
+        width: 100%;
+        min-width: auto;
+      }
+
+      .doc-item form {
+        width: 100%;
+      }
+
+      .doc-item .btn-danger {
+        width: 100%;
+      }
+    }
+
+    /* Extra Small Devices */
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 1.2rem;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .profile-image {
+        width: 100px;
+        height: 100px;
+      }
+
+      h5 {
+        font-size: 1rem;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav class="container">
+      <div class="logo">SmartAid</div>
+
+      <div class="menu-toggle" id="menu-toggle">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('demo') }}">Chat Bot</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li><img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" class="profile-photo" alt="Profile"></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container main-content">
+    <div class="row">
+
+      <!-- User Info -->
+      <div class="col-left">
+        <img src="{{ url_for('static', filename='profile_pics/default.png') }}" class="profile-image" alt="Profile Picture">
+        
+        <div class="card">
+          <h5>Hello, {{ user.first_name }}</h5>
+          <ul class="info-list">
+            <li><b>Name:</b> {{ user.first_name }} {{ user.last_name }}</li>
+            <li><b>Email:</b> {{ user.email }}</li>
+            <li><b>Phone:</b> {{ user.phone }}</li>
+            <li><b>Age:</b> {{ user.age }}</li>
+            <li><b>Gender:</b> {{ user.gender }}</li>
+          </ul>
+        </div>
+
+        <div class="button-container">
+          <a href="{{ url_for('reminder') }}" class="btn btn-primary">Set Reminder</a>
+          <a href="{{ url_for('logout') }}" class="btn btn-warning">Logout</a>
+        </div>
+      </div>
+
+      <!-- Document Upload Section -->
+      <div class="col-right">
+        <div class="card">
+          <h5>📄 Upload & Manage Your Medical Documents</h5>
+
+          <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" class="upload-form">
+            <input type="file" name="file" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+            <button class="btn btn-primary" type="submit">Upload</button>
+          </form>
+
+          <h6>Your Uploaded Documents:</h6>
+          <ul class="doc-list">
+            {% for f in user.documents %}
+              <li class="doc-item">
+                <a href="{{ url_for('uploaded_file', file_id=f.id) }}" target="_blank">{{ f.filename }}</a>
+                <form action="{{ url_for('delete_file', file_id=f.id) }}" method="POST">
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+              </li>
+            {% else %}
+              <li class="empty-state">No documents uploaded yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toggle JS -->
+  <script>
+    const toggle = document.getElementById('menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+
+    toggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!toggle.contains(e.target) && !navLinks.contains(e.target)) {
+        navLinks.classList.remove('active');
+      }
+    });
+  </script>
+
+</body>
+</html>

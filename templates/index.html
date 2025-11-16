@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartAid - Your AI Health Companion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="index-page">
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">SmartAid</div>
+            
+            <!-- Hamburger Toggle Button -->
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+            </button>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="{{ url_for('demo') }}">Chat Bot</a></li>
+                <li><a href="#contact">Contact</a></li>
+                
+                <!-- Auth Section - stays in same place -->
+                <li class="auth-item">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="auth-link">
+                        Dashboard
+                        {% if current_user.profile_pic %}
+                        <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" class="profile-photo" alt="Profile">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='profile_pics/default.png') }}" class="profile-photo" alt="Profile">
+                        {% endif %}
+                    </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="auth-link">Login</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+<!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Your AI Health Companion</h1>
+            <p>Get instant health advice, assess symptom severity, and find nearby medical care when you need it most</p>
+            <a href="{{ url_for('demo') }}" class="cta-button">Try SmartAid Now</a>
+        </div>
+        <br>
+        <span>To find nearby hospitals or clinics. <a id="clickhere" href="{{ url_for('location') }}">click here</a></span>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+    <div class="container">
+        <h2>How SmartAid Helps You</h2>
+        <div class="features-grid">
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚠️</div>
+                <h3>Severity Assessment</h3>
+                <p>Get clear guidance on symptom urgency - from minor concerns to emergency situations requiring immediate care</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📍</div>
+                <h3>Find Nearby Care</h3>
+                <p>Instantly locate the nearest clinics, hospitals, or specialists based on your symptoms and location</p>
+            </div>
+            
+
+            <!-- Additional feature cards -->
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h3>Health Tips</h3>
+                <p>Get daily wellness tips to maintain a healthy lifestyle and prevent common ailments</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Progress Tracking</h3>
+                <p>Monitor your symptoms and health improvements over time with easy-to-read charts and summaries</p>
+            </div> 
+            
+            
+            <div class="feature-card">
+                <div class="feature-icon">🚨</div>
+                <h3>Emergency Alerts</h3>
+                <p>Get instant alerts and guidance during urgent health situations.</p>
+            </div>
+           
+            
+            <div class="feature-card">
+                <div class="feature-icon">🤖💬</div>
+                <h3>AI Chat Support</h3>
+                <p>Chat with an AI assistant to get answers to your basic health questions instantly.</p>
+            </div>
+
+        
+        </div>
+    </div>
+</section>
+
+
+<!-- Trust Section -->
+    <section class="trust">
+        <div class="container">
+            <h2>Trusted by Health-Conscious Individuals</h2>
+            <div class="trust-stats">
+                <div class="stat">
+                    <span class="stat-number">500K+</span>
+                    <span>Users Helped</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">95%</span>
+                    <span>Accuracy Rate</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">24/7</span>
+                    <span>Always Available</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">1000+</span>
+                    <span>Partner Clinics</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>SmartAid</h4>
+                    <p>Your trusted AI health companion for better wellness decisions</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Important</h4>
+                    <p>SmartAid provides general health information only. Always consult healthcare professionals for medical advice.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>support@smartaid.com<br>1-800-SMART-AID</p>
+                </div>
+            </div>
+            <p>&copy; 2025 SmartAid. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        // Toggle mobile menu
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        navToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
+                navToggle.classList.remove('active');
+            }
+        });
+        
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                navToggle.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
