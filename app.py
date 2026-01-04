@@ -14,7 +14,6 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "1234567890abcdef")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///smartaid.db'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Mysql123#@localhost:3306/smartaid'
 
 # Folder to store uploaded files
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
@@ -337,4 +336,5 @@ if __name__ == "__main__":
     # Run the app
     from os import environ
     port = int(environ.get('PORT', 5000))
+
     app.run(host='0.0.0.0', port=port, debug=True)
